@@ -4,6 +4,8 @@
   "description": "API para realizar o CRUD de suas tasks (tarefas)",
   "main": "index.js",
   "scripts": {
+    "lint:check": "prettier --check src/**/*",
+    "lint:fix": "prettier --write src/**/*",
     "start": "node src/server.js",
     "dev": "node --watch src/server.js"
   },
