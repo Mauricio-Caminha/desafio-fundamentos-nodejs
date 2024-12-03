@@ -49,10 +49,17 @@ export class Database {
     const rowIndex = this.#database[table].findIndex((data) => data.id === id);
     const updated_at = new Date();
 
-    if (rowIndex > -1) {
-      this.#database[table][rowIndex] = { id, updated_at, ...data };
-      this.#persist();
-    }
+    if (rowIndex === -1) return rowIndex;
+
+    this.#database[table][rowIndex] = {
+      ...this.#database[table][rowIndex],
+      ...data,
+      updated_at,
+    };
+
+    this.#persist();
+
+    return this.#database[table][rowIndex];
   }
 
   delete(table, id) {

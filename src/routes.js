@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 
 import { Database } from "./db/database.js";
 import { buildRoutePath } from "./utils/build-route-path.js";
+import path from "node:path";
 
 const database = new Database();
 
@@ -65,6 +66,11 @@ export const routes = [
     handler: (req, res) => {
       const { id } = req.params;
       const { title, description } = req.body;
+      const task = database.select("tasks", { id });
+
+      if (task.length === 0) {
+        return res.writeHead(404).end("Task not found");
+      }
 
       if (title && !description) {
         database.update("tasks", id, { title });
@@ -79,6 +85,24 @@ export const routes = [
       }
 
       return res.writeHead(204).end();
+    },
+  },
+  {
+    method: "PATCH",
+    path: buildRoutePath("/tasks/:id/complete"),
+    handler: (req, res) => {
+      const { id } = req.params;
+      const task = database.select("tasks", { id });
+
+      if (task.length === 0) {
+        return res.writeHead(404).end("Task not found");
+      }
+
+      const updatedTask = database.update("tasks", id, {
+        completed_at: task[0].completed_at ? null : new Date(),
+      });
+
+      return res.end(JSON.stringify(updatedTask));
     },
   },
 ];
