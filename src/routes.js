@@ -10,17 +10,20 @@ export const routes = [
     method: "GET",
     path: buildRoutePath("/tasks"),
     handler: (req, res) => {
-      const { search } = req.query;
-      const users = database.select(
+      const { title, description } = req.query;
+
+      const filters = {};
+
+      if (title) filters.title = title;
+
+      if (description) filters.description = description;
+
+      const tasks = database.select(
         "tasks",
-        search
-          ? {
-              title: search,
-              description: search,
-            }
-          : null,
+        Object.keys(filters).length > 0 ? filters : null,
       );
-      return res.end(JSON.stringify(users));
+
+      return res.end(JSON.stringify(tasks));
     },
   },
   {
@@ -40,7 +43,7 @@ export const routes = [
 
       database.insert("tasks", task);
 
-      return res.writeHead(201).end();
+      return res.writeHead(201).end(JSON.stringify(task));
     },
   },
   {
@@ -48,9 +51,12 @@ export const routes = [
     path: buildRoutePath("/tasks/:id"),
     handler: (req, res) => {
       const { id } = req.params;
-      database.delete("tasks", id);
+      const deletedTask = database.delete("tasks", id);
 
-      return res.writeHead(204).end();
+      if (deletedTask === -1) {
+        return res.writeHead(404).end("Task not found");
+      }
+      return res.writeHead(204).end("Task deleted");
     },
   },
   {

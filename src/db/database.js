@@ -19,13 +19,13 @@ export class Database {
     fs.writeFile(databasePath, JSON.stringify(this.#database, null, 2));
   }
 
-  select(table, search) {
+  select(table, filters) {
     let data = this.#database[table] ?? [];
 
-    if (search) {
+    if (filters) {
       data = data.filter((row) => {
-        return Object.entries(search).some(([key, value]) => {
-          return row[key].toLowerCase().includes(value.toLowerCase());
+        return Object.entries(filters).every(([key, value]) => {
+          return row[key]?.toLowerCase().includes(value.toLowerCase());
         });
       });
     }
@@ -58,9 +58,10 @@ export class Database {
   delete(table, id) {
     const rowIndex = this.#database[table].findIndex((data) => data.id === id);
 
-    if (rowIndex > -1) {
-      this.#database[table].splice(rowIndex, 1);
-      this.#persist();
-    }
+    if (rowIndex === -1) return rowIndex;
+
+    this.#database[table].splice(rowIndex, 1);
+    this.#persist();
+    return rowIndex;
   }
 }
