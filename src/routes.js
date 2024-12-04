@@ -33,6 +33,10 @@ export const routes = [
     handler: (req, res) => {
       const { title, description } = req.body;
 
+      if (!title || !description) {
+        return res.writeHead(400).end("Title and description are required");
+      }
+
       const task = {
         id: crypto.randomUUID(),
         title,
@@ -70,6 +74,10 @@ export const routes = [
 
       if (task.length === 0) {
         return res.writeHead(404).end("Task not found");
+      }
+
+      if (!title && !description) {
+        return res.writeHead(400).end("Title and description are required");
       }
 
       if (title && !description) {
