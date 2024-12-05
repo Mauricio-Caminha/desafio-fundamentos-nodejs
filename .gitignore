@@ -131,3 +131,6 @@ dist
 
 # Db Local files
 database.json
+
+# csv files
+*.csv
